@@ -3,6 +3,14 @@ node_modules/
 /.pnp
 .pnp.js
 
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+env/
+venv/
+
 # Testing
 /coverage
 
@@ -20,3 +28,10 @@ node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+*.log
+pgdata/
+mongo-data/
+
+
+

@@ -1,30 +1,3 @@
 {
-  "diagnosis": {
-    "title": "PAPI DIAGNOSIS",
-    "finding": "ATYPICAL SQUAMOUSS CELLS OF UNDETERMINED SIGNIFICANCE (ASC-US)"
-  },
-  "results": {
-    "main_title": "Cytokologic and Molecular Results",
-    "molecular_results": {
-      "title": "MOLECULAR RESULTS:",
-      "high_risk_hpv": "DETECTED",
-      "chlamydia_trachomatis": "not detected",
-      "neisseria_gonorrheae": "not detected",
-      "trichoomonas_vaginalis": "not detected"
-    },
-    "findings": {
-      "title": "Additional Cytokologic Findings",
-      "specimen_adequacies": {
-        "title": "Specimen Adequacy:",
-        "safe for evaluation": "Safe for evaluation."
-      }
-    }
-  },
-  "findings": {
-    "title": "Additional Cytokologic Findings",
-    "specimen_adequacies": {
-      "title": "Specimen Adequacy:",
-      "safe for evaluation": "Safe for evaluation."
-    }
-  }
+  "ocr_text": " \nHealth Scan \nDiagnostics \nHealth Scan \nDiagnostics \nPh No. 0123456789 | 0987654321 \nMail: healthscan.diag@gmail.com \nRoad No. 18, ABC Colony, XYZ, India \nPa ent Details \n \nName: Jane Doe \nDOB: 01.01.1990 \nSex: Female \nPh No.: 1122334455 \n \nExam Details \n \nMedical Test: Pap Smear, Cytology \nExamined By: John Doe \nDate: 29/10/2025 \n \nComprehensive Radiologist Report \nSPECIMEN: Thin Prep\nPAP DIAGNOSIS: \nATYPICAL SQUAMOUS CELLS OF UNDETERMINED SIGNIFICANCE (ASC-US) \n \nCytologic and Molecular Results \nMOLECULAR RESULTS: \n*HIGH RISK HPV RESULT: DETECTED \nCHLAMYDIA TRACHOMATIS RESULTS: not detected \nNEISSERIA GONORRHOEAE RESULTS: not detected \nTRICHOMONAS VAGINALIS RESULTS: not detected \n \nAddi onal Cytologic Findings \nSPECIMEN ADEQUACY: Sa sfactory for evalua on. \nEndocervical/transforma on zone component present \n \nMedical Lab Technician \n(DMLT, BMLT) \nDr. Pxxxxxxxxxxxx \n(MD, Pathologist) \nDr. Fvxxxxxxxxxxxxx\n(MD, Pathologist) \nGenerated on 31.10.2025 \n"
 }

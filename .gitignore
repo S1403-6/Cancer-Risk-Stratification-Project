@@ -1,0 +1,20 @@
+# MongoDB data
+mongo-data/
+
+# PostgreSQL data
+pgdata/
+
+# Node
+node_modules/
+
+# Python
+__pycache__/
+*.pyc
+env/
+venv/
+
+# Logs
+*.log
+
+# OS
+.DS_Store

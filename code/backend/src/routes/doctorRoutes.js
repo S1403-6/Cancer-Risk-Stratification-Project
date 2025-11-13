@@ -13,7 +13,7 @@ router.get('/reports', doctorController.getAllReports);
 // GET /api/doctor/reports/:reportId - Get detailed report
 router.get('/reports/:reportId', doctorController.getReportById);
 
-// POST /api/doctor/reports/:reportId/verify - Verify report
-router.post('/reports/:reportId/verify', doctorController.verifyReport);
+// PUT /api/doctor/verify/:reportId - Verify report
+router.put('/verify/:reportId', doctorController.verifyReport);
 
 module.exports = router;

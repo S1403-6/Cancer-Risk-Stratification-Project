@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db');
+const path = require('path');
 
 // Import routes
 const authRoutes = require('./routes/authRoutes');
@@ -23,8 +24,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve uploaded files from /uploads
-const path = require('path');
+// Serve uploaded files
 app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
 
 // Mount routes
@@ -35,13 +35,12 @@ app.use('/api/pathologist', pathologistRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-    console.error(err.stack);
+    console.error('Error:', err.stack);
     res.status(500).json({ message: 'Something went wrong!' });
 });
 
 // Start server
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+    console.log(`✅ Server running on port ${PORT}`);
 });
-

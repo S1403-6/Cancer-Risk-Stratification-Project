@@ -1,0 +1,7 @@
+numpy
+requests
+pytesseract
+opencv-python
+Pillow
+torch
+transformers

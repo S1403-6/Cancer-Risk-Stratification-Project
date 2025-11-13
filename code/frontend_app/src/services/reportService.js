@@ -6,28 +6,36 @@ export const reportService = {
     const formData = new FormData();
     formData.append('report', file);
 
-    // Use direct axios post with multipart headers
     const token = localStorage.getItem('authToken');
-    const response = await fetch('http://localhost:5001/api/pathologist/upload', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`
-      },
-      body: formData
-    });
 
-    if (!response.ok) {
-      throw new Error(`Upload failed: ${response.statusText}`);
+    try {
+      const response = await fetch('http://localhost:5001/api/pathologist/upload', {
+        method: 'POST',
+        headers: {
+          // ❌ Do NOT manually set Content-Type for FormData; browser handles it automatically
+          'Authorization': `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Upload failed: ${response.status} - ${errorText}`);
+      }
+
+      // Return JSON data from backend
+      return await response.json();
+    } catch (err) {
+      console.error('[Upload Error]', err);
+      throw err;
     }
-
-    return response.json();
   },
 
   // Confirm upload for existing patient
   confirmUpload: async (patientId, reportData) => {
     const response = await apiClient.post('/pathologist/upload/confirm', {
       patientId,
-      reportData
+      reportData,
     });
     return response.data;
   },
@@ -48,8 +56,8 @@ export const reportService = {
   verifyReport: async (reportId, doctorComments, doctorScore) => {
     const response = await apiClient.post(`/doctor/reports/${reportId}/verify`, {
       doctorComments,
-      doctorScore
+      doctorScore,
     });
     return response.data;
-  }
+  },
 };

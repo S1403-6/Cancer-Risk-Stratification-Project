@@ -13,19 +13,19 @@ export const PathologistDashboard = () => {
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
-      // Validate file size (max 10MB)
       if (selectedFile.size > 10 * 1024 * 1024) {
         setError('File size must be less than 10MB');
         setFile(null);
         return;
       }
-      // Validate file type
+
       const allowedTypes = ['image/jpeg', 'image/png', 'application/pdf'];
       if (!allowedTypes.includes(selectedFile.type)) {
         setError('Only JPG, PNG, and PDF files are allowed');
         setFile(null);
         return;
       }
+
       setFile(selectedFile);
       setError('');
       setMessage('');
@@ -34,7 +34,6 @@ export const PathologistDashboard = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
     if (!file) {
       setError('Please select a file');
       return;
@@ -46,7 +45,6 @@ export const PathologistDashboard = () => {
     setUploadProgress(0);
 
     try {
-      // Simulate progress
       const progressInterval = setInterval(() => {
         setUploadProgress((prev) => {
           if (prev >= 90) return prev;
@@ -55,16 +53,14 @@ export const PathologistDashboard = () => {
       }, 500);
 
       const response = await reportService.uploadReport(file);
-      
+
       clearInterval(progressInterval);
       setUploadProgress(100);
-
       setUploadedReport(response);
       setMessage('✅ Report uploaded successfully! Processing started.');
       setFile(null);
       setUploadProgress(0);
 
-      // Reset form
       setTimeout(() => {
         setMessage('');
         setUploadedReport(null);
@@ -73,8 +69,8 @@ export const PathologistDashboard = () => {
     } catch (err) {
       setError(
         err.response?.data?.message ||
-        err.message ||
-        'Failed to upload report. Please try again.'
+          err.message ||
+          'Failed to upload report. Please try again.'
       );
       setUploadProgress(0);
     } finally {
@@ -86,7 +82,7 @@ export const PathologistDashboard = () => {
     <div className="upload-container">
       <div className="upload-card">
         <h1>📋 Upload Pathology Report</h1>
-        
+
         <form onSubmit={handleSubmit} className="upload-form">
           <div className="file-input-wrapper">
             <label htmlFor="file-input" className="file-label">
@@ -107,15 +103,9 @@ export const PathologistDashboard = () => {
 
           {file && (
             <div className="file-info">
-              <p>
-                <strong>File:</strong> {file.name}
-              </p>
-              <p>
-                <strong>Size:</strong> {(file.size / 1024).toFixed(2)} KB
-              </p>
-              <p>
-                <strong>Type:</strong> {file.type || 'Unknown'}
-              </p>
+              <p><strong>File:</strong> {file.name}</p>
+              <p><strong>Size:</strong> {(file.size / 1024).toFixed(2)} KB</p>
+              <p><strong>Type:</strong> {file.type || 'Unknown'}</p>
             </div>
           )}
 
@@ -125,10 +115,7 @@ export const PathologistDashboard = () => {
           {uploading && (
             <div className="progress-container">
               <div className="progress-bar">
-                <div
-                  className="progress-fill"
-                  style={{ width: `${uploadProgress}%` }}
-                ></div>
+                <div className="progress-fill" style={{ width: `${uploadProgress}%` }}></div>
               </div>
               <p className="progress-text">{Math.round(uploadProgress)}%</p>
             </div>
@@ -137,12 +124,8 @@ export const PathologistDashboard = () => {
           {uploadedReport && (
             <div className="report-details">
               <h3>📊 Report Details</h3>
-              <p>
-                <strong>Report ID:</strong> {uploadedReport.reportId}
-              </p>
-              <p>
-                <strong>Status:</strong> In Progress
-              </p>
+              <p><strong>Report ID:</strong> {uploadedReport.reportId}</p>
+              <p><strong>Status:</strong> In Progress</p>
               <p className="info-text">
                 Your report has been submitted for processing. An LLM analysis and OCR extraction will be performed.
               </p>
@@ -164,7 +147,7 @@ export const PathologistDashboard = () => {
             <li>Supported formats: JPG, PNG, PDF</li>
             <li>Maximum file size: 10 MB</li>
             <li>Reports will be processed using OCR and LLM analysis</li>
-            <li>Processing typically takes 1-5 minutes</li>
+            <li>Processing typically takes 1–5 minutes</li>
           </ul>
         </div>
       </div>

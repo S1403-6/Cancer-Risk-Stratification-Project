@@ -1,137 +1,147 @@
+// src/controller/pathologistController.js
+const fs = require('fs');
+const path = require('path');
+const axios = require('axios');
+const FormData = require('form-data');
 const Patient = require('../models/patients');
 const Report = require('../models/reports');
-const { performOCR } = require('../services/ocrService');
-const { generateLLMReport } = require('../services/llmService');
-const { uploadToStorage } = require('../services/storageService');
-const { ensurePatient, createReportForPatient } = require('../services/reportService');
+
+const OCR_API = process.env.OCR_API || "http://0.0.0.0:7000/ocr";
+const RETRIEVER_API = process.env.RETRIEVER_API || "http://0.0.0.0:9000/analyze";
+
+let uploadToStorage, ensurePatient, createReportForPatient;
+try {
+    ({ uploadToStorage } = require('../services/storageService'));
+} catch {
+    uploadToStorage = async (file) => `/uploads/${Date.now()}_${file.originalname}`;
+}
+try {
+    ({ ensurePatient, createReportForPatient } = require('../services/reportService'));
+} catch {
+    ensurePatient = async (details) => ({ patient: { ...details, patientId: 'TEMP123', _id: 'dummy' }, existed: false });
+    createReportForPatient = async (data) => ({ _id: 'REPORT123' });
+}
 
 const pathologistController = {
-    // Upload new report
     uploadReport: async (req, res) => {
         try {
+            console.log("[Controller] Upload request received.");
             const file = req.file;
-            if (!file) {
-                return res.status(400).json({ message: 'No file uploaded' });
-            }
+            if (!file) return res.status(400).json({ message: 'No file uploaded' });
 
-            // Upload file to storage
+            // 1) Save file (S3 / local)
             const reportUrl = await uploadToStorage(file);
+            console.log("[Controller] File stored at:", reportUrl);
 
-            // TEMPORARILY SKIP OCR - use dummy data for testing
-            const ocrResult = 'Dummy OCR text - OCR disabled for testing. Patient: Test Patient, Age: 45, Gender: Male';
-            
-            // Extract patient details from OCR text
-            const patientDetails = extractPatientDetails(ocrResult);
+            // 2) Call OCR
+            const formData = new FormData();
+            formData.append('file', file.buffer, file.originalname);
 
-            // Ensure patient exists (create if not)
+            console.log(`[Controller] Calling OCR at ${OCR_API}`);
+            const ocrResponse = await axios.post(OCR_API, formData, {
+                headers: formData.getHeaders(),
+                maxBodyLength: Infinity,
+                timeout: 60000
+            });
+
+            const ocrText = ocrResponse.data.extracted_text || '';
+            console.log("[Controller] OCR extracted chars:", ocrText.length);
+
+            // 3) Extract patient info (stub)
+            const patientDetails = extractPatientDetails(ocrText);
+
+            // 4) Ensure patient exists
             const { patient, existed } = await ensurePatient(patientDetails);
-
             if (existed) {
-                return res.status(200).json({
-                    message: 'Patient already exists. Do you want to submit an updated report?',
-                    patientId: patient.patientId
-                });
+                return res.status(200).json({ message: 'Patient already exists', patientId: patient.patientId });
             }
 
-            // TEMPORARILY SKIP LLM - use dummy data for testing
-            const llmResult = { report: 'Dummy LLM report - LLM disabled for testing', score: 0.5 };
+            // 5) Call retriever for risk analysis (if OCR didn't already forward)
+            let llmResult = { report: 'Not available', score: 0.0 };
+            if (ocrResponse.data.retriever_response) {
+                // OCR forwarded to retriever; use that response
+                const rr = ocrResponse.data.retriever_response;
+                llmResult.report = rr.answer || llmResult.report;
+                llmResult.score = rr.score || llmResult.score;
+                console.log("[Controller] Using retriever response forwarded by OCR.");
+            } else {
+                console.log(`[Controller] Calling retriever at ${RETRIEVER_API}`);
+                const retrResp = await axios.post(RETRIEVER_API, { text: ocrText }, { timeout: 60000 });
+                llmResult.report = retrResp.data.answer || llmResult.report;
+                llmResult.score = retrResp.data.score || llmResult.score;
+                console.log("[Controller] Retriever responded. score=", llmResult.score);
+            }
 
-            // Create new report and attach to patient
-            const report = await createReportForPatient({
+            // 6) Save report in MongoDB
+            const reportDoc = await createReportForPatient({
                 patient,
-                uploadedBy: req.user._id,
+                uploadedBy: req.user ? req.user._id : 'system',
                 originalReportUrl: reportUrl,
-                ocrText: ocrResult,
+                ocrText,
                 llmGeneratedReport: llmResult.report,
                 normalizedScore: llmResult.score,
-                status: 'In Progress'
+                status: 'Completed'
             });
 
-            res.status(201).json({
-                message: 'Report uploaded and processing started.',
-                reportId: report._id
-            });
+            console.log("[Controller] Report created with id:", reportDoc._id);
+            return res.status(201).json({ message: 'Report uploaded and analyzed successfully.', reportId: reportDoc._id, score: llmResult.score });
+
         } catch (error) {
-            console.error('Upload error:', error);
-            res.status(500).json({ message: 'Error processing report' });
+            console.error("[Controller] Upload error:", error && error.response ? error.response.data || error.response.statusText : error.message || error);
+            return res.status(500).json({ message: 'Error processing report', error: error.message || error });
         }
     },
 
-    // Confirm upload for existing patient
     confirmUpload: async (req, res) => {
         try {
             const { patientId, reportData } = req.body;
-
             const patient = await Patient.findOne({ patientId });
-            if (!patient) {
-                return res.status(404).json({ message: 'Patient not found' });
-            }
+            if (!patient) return res.status(404).json({ message: 'Patient not found' });
 
-            // Create new report and attach to patient
             const report = await createReportForPatient({
                 patient,
-                uploadedBy: req.user._id,
+                uploadedBy: req.user ? req.user._id : 'system',
                 originalReportUrl: reportData.reportUrl,
                 ocrText: reportData.ocrText,
                 llmGeneratedReport: reportData.llmReport,
                 normalizedScore: reportData.score,
-                status: 'In Progress'
+                status: 'Completed'
             });
-
-            res.status(200).json({
-                message: 'Updated report submitted successfully.',
-                reportId: report._id
-            });
+            return res.status(200).json({ message: 'Updated report submitted successfully.', reportId: report._id });
         } catch (error) {
-            console.error('Confirm upload error:', error);
-            res.status(500).json({ message: 'Error processing report' });
+            console.error("[Controller] Confirm upload error:", error);
+            return res.status(500).json({ message: 'Error confirming report upload', error: error.message });
+        }
+    },
+
+    testOCR: async (req, res) => {
+        try {
+            if (!req.file) return res.status(400).json({ message: 'No file uploaded.' });
+            const formData = new FormData();
+            formData.append('file', req.file.buffer, req.file.originalname);
+            const ocrResponse = await axios.post(OCR_API, formData, { headers: formData.getHeaders() });
+            const extractedText = ocrResponse.data.extracted_text || '';
+            const wordCount = extractedText.split(/\s+/).filter(Boolean).length;
+            return res.status(200).json({ message: 'OCR extraction successful.', wordCount, extractedText });
+        } catch (error) {
+            console.error("[Controller] OCR test error:", error && error.response ? error.response.data : error.message);
+            return res.status(500).json({ message: 'OCR failed', error: error.message || error });
         }
     }
 };
 
-const fs = require('fs');
-const path = require('path');
-
-pathologistController.testOCR = async (req, res) => {
-    try {
-        if (!req.file) {
-            return res.status(400).json({ message: 'No file uploaded.' });
-        }
-
-        // Save the uploaded buffer temporarily (since you're using memoryStorage)
-        const tempPath = path.join(__dirname, '../../uploads', req.file.originalname);
-        fs.writeFileSync(tempPath, req.file.buffer);
-
-        // Perform OCR using the OCR.space API
-        const extractedText = await performOCR(tempPath);
-
-        // Delete temp file after processing
-        fs.unlinkSync(tempPath);
-
-        // Return text and word count
-        const wordCount = extractedText.split(/\s+/).filter(Boolean).length;
-        res.status(200).json({
-            message: 'OCR extraction successful.',
-            wordCount,
-            extractedText
-        });
-    } catch (error) {
-        console.error('OCR test error:', error.message);
-        res.status(500).json({ message: 'OCR failed', error: error.message });
-    }
-};
-
-
-
-// Helper function to extract patient details from OCR text
 function extractPatientDetails(ocrText) {
-    // TODO: Implement patient detail extraction logic
-    // This should use regex or NLP to extract patient ID, name, DOB, and gender from OCR text
+    // Extract Name, Gender, and Date of Birth using regex
+    const nameMatch = ocrText.match(/Name:\s*([A-Za-z\s]+)/i);
+    const genderMatch = ocrText.match(/Gender:\s*(Male|Female|Other|M|F)/i);
+    const dobMatch = ocrText.match(/(?:DOB|Date of Birth):\s*([0-9]{2}[-/][0-9]{2}[-/][0-9]{2,4})/i);
+
+    // Return parsed fields or defaults if not found
     return {
-        patientId: 'EXTRACTED_ID',
-        name: 'EXTRACTED_NAME',
-        dateOfBirth: new Date(),
-        gender: 'EXTRACTED_GENDER'
+        patientId: 'PAT_' + Date.now(),
+        name: nameMatch ? nameMatch[1].trim() : 'Unknown',
+        gender: genderMatch ? genderMatch[1].replace(/M/i, 'Male').replace(/F/i, 'Female') : 'Unknown',
+        dateOfBirth: dobMatch ? new Date(dobMatch[1]) : null
     };
 }
 

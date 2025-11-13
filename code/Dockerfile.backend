@@ -1,0 +1,20 @@
+# -----------------------------
+# Base image for Node.js
+FROM node:18-slim
+
+WORKDIR /app
+
+# Copy package.json and package-lock.json for efficient caching.
+# Assumes these files are in 'code/backend/' relative to the build context.
+COPY backend/package*.json ./
+
+# Install dependencies. This step is cached if package*.json doesn't change.
+RUN npm install
+
+# Copy the rest of the backend files.
+# This copies everything from the backend folder into the /app directory.
+COPY backend/ ./
+
+# NOTE: The entry point (server.js) is inside src/services/
+EXPOSE 5001
+CMD ["node", "src/services/server.js"]

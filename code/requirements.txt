@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+requests
+python-multipart 
+psycopg2-binary
+sentence-transformers
+numpy
+pydantic
+transformers
+PyMuPDF

@@ -1,0 +1,57 @@
+# -----------------------------
+# Stage 1: Base Image and System Dependencies
+FROM python:3.10-slim AS base
+WORKDIR /app
+
+# Install system dependencies
+# This layer is highly cacheable as it changes rarely.
+RUN apt-get update && \
+    apt-get install -y libpq-dev gcc poppler-utils && \
+    rm -rf /var/lib/apt/lists/*
+
+# -----------------------------
+# Stage 2: Python Dependencies (The Caching Stage)
+FROM base AS deps
+WORKDIR /app
+
+# Copy requirements.txt FIRST to maximize cache use.
+# Assumes requirements.txt is in the build context root (code/../requirements.txt)
+# Adjust path if requirements.txt is elsewhere.
+COPY requirements.txt .
+
+# Install Python packages - This is the long step.
+RUN pip install --no-cache-dir -r requirements.txt
+
+# -----------------------------
+# Stage 3: Retriever Service
+FROM base AS retriever
+WORKDIR /app
+
+# Copy installed Python packages from deps stage
+COPY --from=deps /usr/local/lib/python3.10/site-packages /usr/local/lib/python3.10/site-packages
+
+# Copy only the service file from the correct location
+COPY backend/src/services/retrieverService.py .
+
+EXPOSE 9000
+CMD ["python", "retrieverService.py"]
+
+# -----------------------------
+# Stage 4: LLM Service
+FROM base AS llm
+WORKDIR /app
+COPY --from=deps /usr/local/lib/python3.10/site-packages /usr/local/lib/python3.10/site-packages
+COPY backend/src/services/llmService.py .
+
+EXPOSE 8000
+CMD ["python", "llmService.py"]
+
+# -----------------------------
+# Stage 5: OCR Service
+FROM base AS ocr
+WORKDIR /app
+COPY --from=deps /usr/local/lib/python3.10/site-packages /usr/local/lib/python3.10/site-packages
+COPY backend/src/services/ocrService.py .
+
+EXPOSE 7000
+CMD ["python", "ocrService.py"]

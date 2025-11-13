@@ -1,0 +1,107 @@
+version: "3.9"
+
+services:
+  node-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    ports:
+      - "5001:5001"
+    working_dir: /app
+    command: ["node", "src/server.js"]
+    # Added 'ocr' and 'retriever' to ensure they start before the backend tries to connect
+    depends_on:
+      - postgres
+      - ocr
+      - retriever
+    volumes:
+      - ./backend:/app
+    environment:
+      # CRITICAL FIX: Directs the Node backend to use the Docker service name 'ocr' (port 7000)
+      - OCR_API=http://ocr:7000/ocr 
+      # Directs the Node backend to use the Docker service name 'retriever' (port 9000)
+      - RETRIEVER_API=http://retriever:9000/analyze
+    networks:
+      backend_net:
+
+  retriever:
+    build:
+      context: .
+      dockerfile: Dockerfile.python
+      target: retriever
+    ports:
+      - "8500:9000"
+    working_dir: /app
+    command: ["python", "retrieverService.py"]
+    depends_on:
+      - postgres
+    volumes:
+      - ./backend/src/services:/app
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=yourpassword
+      - DB_NAME=chunks_db
+      - BIOBERT_API=http://llm:8000/ask
+      - RETRIEVER_PORT=9000
+    networks:
+      backend_net:
+
+  llm:
+    build:
+      context: .
+      dockerfile: Dockerfile.python
+      target: llm
+    ports:
+      - "8001:8000" # Host port changed from 8000 to 8001
+    working_dir: /app
+    command: ["python", "llmService.py"]
+    volumes:
+      - ./backend/src/services:/app
+    networks:
+      backend_net:
+
+  ocr:
+    build:
+      context: .
+      dockerfile: Dockerfile.python
+      target: ocr
+    ports:
+      - "7000:7000"
+    working_dir: /app
+    command: ["python", "ocrService.py"]
+    volumes:
+      - ./backend/src/services:/app
+    networks:
+      backend_net:
+
+  postgres:
+    image: ankane/pgvector:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: yourpassword
+      POSTGRES_DB: chunks_db
+    ports:
+      - "5434:5432" # Host port changed from 5433 to 5434
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      backend_net:
+
+  mongo:
+    image: mongo:5
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./mongo-data:/data/db
+    networks:
+      backend_net:
+
+volumes:
+  pgdata:
+  mongodb_data:
+
+networks:
+  backend_net:
+    driver: bridge

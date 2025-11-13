@@ -4,22 +4,25 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  background: #f5f5f5;
 }
 
 .upload-card {
   background: white;
-  border-radius: 8px;
-  padding: 2rem;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  padding: 3rem 2.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   width: 100%;
   max-width: 600px;
+  border: 1px solid #e0e0e0;
 }
 
 .upload-card h1 {
   text-align: center;
-  color: #2c3e50;
+  color: #000000;
   margin-bottom: 2rem;
-  font-size: 2rem;
+  font-size: 1.5rem;
+  font-weight: 600;
 }
 
 .upload-form {
@@ -38,25 +41,28 @@
   justify-content: center;
   gap: 1rem;
   padding: 2rem;
-  border: 2px dashed #667eea;
-  border-radius: 8px;
+  border: 2px dashed #d0d0d0;
+  border-radius: 2px;
   cursor: pointer;
-  transition: all 0.3s ease;
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+  transition: all 0.2s ease;
+  background: #fafafa;
 }
 
 .file-label:hover {
-  border-color: #764ba2;
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  border-color: #000000;
+  background: #f5f5f5;
 }
 
 .upload-icon {
-  font-size: 3rem;
+  font-size: 4rem;
+  font-weight: 300;
+  color: #999999;
+  line-height: 1;
 }
 
 .upload-text {
   text-align: center;
-  color: #2c3e50;
+  color: #000000;
   font-weight: 500;
 }
 
@@ -65,33 +71,37 @@
 }
 
 .file-info {
-  background: #ecf0f1;
+  background: #f8f8f8;
   padding: 1rem;
-  border-radius: 4px;
+  border-radius: 2px;
   margin-bottom: 1rem;
+  border: 1px solid #e0e0e0;
 }
 
 .file-info p {
   margin: 0.5rem 0;
-  color: #2c3e50;
+  color: #000000;
+  font-size: 0.9rem;
 }
 
 .error-message {
   background: #fee;
   color: #c33;
   padding: 1rem;
-  border-radius: 4px;
+  border-radius: 2px;
   margin-bottom: 1rem;
-  border-left: 4px solid #c33;
+  border-left: 3px solid #c33;
+  font-size: 0.9rem;
 }
 
 .success-message {
   background: #efe;
-  color: #3c3;
+  color: #2c8a2c;
   padding: 1rem;
-  border-radius: 4px;
+  border-radius: 2px;
   margin-bottom: 1rem;
-  border-left: 4px solid #3c3;
+  border-left: 3px solid #27ae60;
+  font-size: 0.9rem;
 }
 
 .progress-container {
@@ -101,7 +111,7 @@
 .progress-bar {
   width: 100%;
   height: 8px;
-  background: #ecf0f1;
+  background: #e0e0e0;
   border-radius: 4px;
   overflow: hidden;
   margin-bottom: 0.5rem;
@@ -109,58 +119,62 @@
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  background: #000000;
   border-radius: 4px;
   transition: width 0.3s ease;
 }
 
 .progress-text {
   text-align: center;
-  color: #7f8c8d;
+  color: #000000;
   font-size: 0.9rem;
+  font-weight: 600;
 }
 
 .report-details {
-  background: #f0f7ff;
+  background: #f8f8f8;
   padding: 1rem;
-  border-radius: 4px;
+  border-radius: 2px;
   margin-bottom: 1rem;
-  border-left: 4px solid #667eea;
+  border-left: 3px solid #000000;
+  border: 1px solid #e0e0e0;
 }
 
 .report-details h3 {
-  color: #2c3e50;
+  color: #000000;
   margin-bottom: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
 }
 
 .report-details p {
-  color: #34495e;
+  color: #000000;
   margin: 0.5rem 0;
+  font-size: 0.9rem;
 }
 
 .info-text {
-  font-size: 0.9rem;
-  color: #7f8c8d;
+  font-size: 0.85rem;
+  color: #666666;
   font-style: italic;
+  margin-top: 0.75rem;
 }
 
 .upload-btn {
   width: 100%;
-  padding: 1rem;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  padding: 0.85rem;
+  background: #000000;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 2px;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
-  text-transform: uppercase;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
 .upload-btn:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  background: #333333;
 }
 
 .upload-btn:disabled {
@@ -169,14 +183,17 @@
 }
 
 .upload-info {
-  background: #f8f9fa;
+  background: #f8f8f8;
   padding: 1.5rem;
-  border-radius: 8px;
+  border-radius: 2px;
+  border: 1px solid #e0e0e0;
 }
 
 .upload-info h3 {
-  color: #2c3e50;
+  color: #000000;
   margin-bottom: 1rem;
+  font-size: 1rem;
+  font-weight: 600;
 }
 
 .upload-info ul {
@@ -186,16 +203,36 @@
 
 .upload-info li {
   padding: 0.5rem 0;
-  color: #34495e;
-  border-bottom: 1px solid #ecf0f1;
+  color: #000000;
+  border-bottom: 1px solid #e0e0e0;
   padding-left: 1rem;
+  font-size: 0.9rem;
+}
+
+.upload-info li:last-child {
+  border-bottom: none;
 }
 
 .upload-info li:before {
   content: "✓ ";
-  color: #27ae60;
+  color: #000000;
   font-weight: bold;
   margin-right: 0.5rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .upload-container {
+    padding: 1rem;
+  }
+
+  .upload-card {
+    padding: 2rem 1.5rem;
+  }
+
+  .upload-card h1 {
+    font-size: 1.25rem;
+  }
 }
 
 .upload-info li:last-child {
