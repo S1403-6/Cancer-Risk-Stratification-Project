@@ -2,7 +2,7 @@
 
 A comprehensive system for analyzing pathology reports using OCR (Optical Character Recognition) and LLM (Large Language Models) to stratify cancer risk. Built with Node.js/Express backend and React frontend.
 
-## 🏥 Overview
+## Overview
 
 The Cancer Risk Stratification System enables:
 
@@ -11,7 +11,7 @@ The Cancer Risk Stratification System enables:
 3. **Doctors** to review and verify the analysis with professional scores
 4. **Secure Storage** of all reports and analysis results in MongoDB
 
-## 🏗️ Architecture
+##  Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -35,7 +35,7 @@ The Cancer Risk Stratification System enables:
 └─────────────────────────────────────────────────────────────┘
 ```
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 cancer_project/
@@ -67,7 +67,7 @@ cancer_project/
 │   └── README.md             # This file
 ```
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -116,7 +116,7 @@ npm start
 
 Frontend will open at: `http://localhost:3000`
 
-## 📋 Usage Guide
+## Usage Guide
 
 ### For Pathologists
 
@@ -143,7 +143,7 @@ Frontend will open at: `http://localhost:3000`
    - Verification score
    - Submit for completion
 
-## 🔄 Data Flow
+## Data Flow
 
 ```
 1. Pathologist Upload
@@ -182,7 +182,7 @@ Frontend will open at: `http://localhost:3000`
    └─ Report marked verified in DB
 ```
 
-## 🔐 Security Features
+## Security Features
 
 - **JWT Authentication**: Secure token-based auth
 - **Role-Based Access Control**: Different permissions for pathologist/doctor
@@ -224,7 +224,7 @@ Frontend will open at: `http://localhost:3000`
 - timestamps
 ```
 
-## 🛠️ Key Technologies
+## Key Technologies
 
 ### Backend
 - **Express.js**: Web server framework
@@ -243,7 +243,7 @@ Frontend will open at: `http://localhost:3000`
 - **Context API**: State management
 - **CSS3**: Styling with gradients
 
-## 📊 API Endpoints
+## API Endpoints
 
 See detailed API documentation in:
 - [Backend README](./backend/README.md#api-endpoints)
@@ -275,7 +275,7 @@ curl -X GET http://localhost:5001/api/doctor/reports \
 7. View uploaded report
 8. Add verification
 
-## 📈 Performance Considerations
+## Performance Considerations
 
 - **Database Indexes**: Optimized for common queries
 - **File Storage**: Consider cloud storage for production
@@ -283,7 +283,7 @@ curl -X GET http://localhost:5001/api/doctor/reports \
 - **LLM Scoring**: Local implementation for speed
 - **Caching**: Can be added for frequently accessed data
 
-## 🚨 Troubleshooting
+## Troubleshooting
 
 ### MongoDB Connection Error
 ```bash
@@ -315,7 +315,7 @@ MONGO_URI=mongodb://localhost:27017/cancer-risk-db
 - Check JWT_SECRET matches between sessions
 ```
 
-## 📝 Environment Variables
+## Environment Variables
 
 ### Backend (.env)
 
@@ -333,7 +333,7 @@ OCR_SPACE_API_KEY=your_key_here        # OCR.space API key
 REACT_APP_API_URL=http://localhost:5001/api
 ```
 
-## 🔄 Service Layer Architecture
+## Service Layer Architecture
 
 The `reportService.js` provides centralized business logic:
 
@@ -360,14 +360,14 @@ Benefits:
 - Easy to extend with additional validation
 - Maintains referential integrity
 
-## 📚 Documentation
+## Documentation
 
 - [Backend Documentation](./backend/README.md)
 - [Frontend Documentation](./frontend_app/README.md)
 - API endpoints documented with cURL examples
 - Database schema diagrams included
 
-## 🔮 Future Enhancements
+## Future Enhancements
 
 - [ ] Advanced LLM integration (GPT-4, Claude)
 - [ ] Real-time notifications via WebSockets
@@ -380,23 +380,23 @@ Benefits:
 - [ ] CI/CD pipeline
 - [ ] Containerization (Docker)
 
-## 📝 License
+## License
 
 ISC
 
-## 👥 Contributors
+## Contributors
 
 - Development Team
 - IIITH DFSI Course Project
 
-## 📞 Support
+## Support
 
 For issues, questions, or contributions:
 1. Create an issue on GitHub
 2. Submit a pull request
 3. Contact the development team
 
-## ✅ Checklist for Deployment
+## Checklist for Deployment
 
 - [ ] Set up MongoDB
 - [ ] Create .env files
